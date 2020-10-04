@@ -12,9 +12,9 @@ namespace Parallel
             Model model=new Model();
             CancellationTokenSource source=new CancellationTokenSource();
             // source.Cancel();
-            // model.PredImages(@"..\ModelLib\Samples", Console.OpenStandardOutput(), source.Token); 
-            FileStream fileStream=File.OpenWrite("output.txt");
-            model.PredImages(@"..\ModelLib\Samples", fileStream, source.Token);
+            model.PredImages(@"..\ModelLib\Samples", Console.OpenStandardOutput(), source.Token); 
+            // FileStream fileStream=File.OpenWrite("output.txt");
+            // model.PredImages(@"..\ModelLib\Samples", fileStream, source.Token);
             Console.Write(model.ErrorMsg);
         }
     }

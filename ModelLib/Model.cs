@@ -19,11 +19,14 @@ namespace ModelLib
         const int imageWidth=28;
         const int imageHeight=28;
         public string ErrorMsg {get; set;}
-        public string ModelPath {get; set;}
-        public Model(string modelPath=@"..\ModelLib\mnist-8.onnx")
+        string ModelPath {get;}
+        string InputName {get;}
+        public Model(string modelPath=@"..\ModelLib\mnist-8.onnx", 
+                     string inputName="Input3")
         {
             ErrorMsg=null;
-            this.ModelPath=modelPath;
+            ModelPath=modelPath;
+            InputName=inputName;
         }
         public string PredImage(string imagePath)
         {
@@ -60,7 +63,7 @@ namespace ModelLib
                 //make an input
                 var inputs = new List<NamedOnnxValue>
                 {
-                    NamedOnnxValue.CreateFromTensor("Input3", input)
+                    NamedOnnxValue.CreateFromTensor(InputName, input)
                 };
                 //run model
                 var session = new InferenceSession(ModelPath);
@@ -91,16 +94,12 @@ namespace ModelLib
             try {
                 Parallel.For(0, files.Count(), options, (i) =>
                 {
-                    // if (options.CancellationToken.IsCancellationRequested)
-                    // {
-                    //     return;
-                    // }    
                     string output=this.PredImage(files[i]);
                     lock (writer) {
                         writer.WriteLine(i+"."+files[i]+" "+output+"\n");
-                        writer.Flush();
                     }
                 });
+                writer.Dispose();
             }
             catch(Exception ex)
             {
