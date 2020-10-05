@@ -15,7 +15,6 @@ namespace Parallel
         static void Main(string[] args)
         {
             Model model=new Model();
-            CancellationTokenSource source=new CancellationTokenSource();
             Console.CancelKeyPress += new ConsoleCancelEventHandler(CancelHandler);
             model.PredImages(@"..\ModelLib\Samples", Console.OpenStandardOutput(), source.Token); 
             // FileStream fileStream=File.OpenWrite("output.txt");
