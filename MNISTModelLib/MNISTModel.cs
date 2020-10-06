@@ -122,14 +122,14 @@ namespace MNISTModelLib
         }
         public void PredImages(string dirPath, CancellationToken token)
         {
-            var files=Directory.EnumerateFiles(dirPath).ToList<string>();
+            var files=Directory.EnumerateFiles(dirPath);
             ParallelOptions options = new ParallelOptions();
             options.CancellationToken = token;
             try {
-                Parallel.For(0, files.Count(), options, (i) =>
+                Parallel.ForEach(files, options, (file) =>
                 {
-                    var result=this.PredImage(files[i]);
-                    ResultIsReady(this, new ResultEventArgs(result));
+                    var result=this.PredImage(file);
+                    ResultIsReady?.Invoke(this, new ResultEventArgs(result));
                 });
             }
             catch(Exception ex)
