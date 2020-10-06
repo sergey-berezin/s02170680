@@ -12,41 +12,70 @@ using System.Threading;
 using System.Threading.Tasks;
 
 
-namespace ModelLib
+namespace MNISTModelLib
 {
-    public class Model
+    public struct MNISTModelResult 
+    {
+        public string ImagePath {get; set;}
+        public int ImageClass {get; set;}
+        public float Confidence {get; set;}
+        public MNISTModelResult(string imagePath=null, int imageClass=-1, float confidence=-1)
+        {
+            ImagePath=imagePath;
+            ImageClass=imageClass;
+            Confidence=confidence;
+        }
+        public override string ToString()
+        {
+            return ImagePath+": "+"class = "+ImageClass.ToString()+
+                   ", confidence = "+Confidence.ToString();
+        }
+    }
+
+
+    public delegate void  ResultEventHandler(object sender, ResultEventArgs args);
+    public class ResultEventArgs: EventArgs
+    {
+        public MNISTModelResult Result {get;}
+        public ResultEventArgs(MNISTModelResult result) 
+        {
+            Result=new MNISTModelResult(result.ImagePath, result.ImageClass, result.Confidence);
+        }
+    }
+
+
+    public class MNISTModel
     {
         const int imageWidth=28;
         const int imageHeight=28;
-        public string ErrorMsg {get; set;}
         string ModelPath {get;}
         string InputName {get;}
-        public Model(string modelPath=@"..\ModelLib\mnist-8.onnx", 
-                     string inputName="Input3")
+        public string ErrorMsg {get; set;}
+        public event ResultEventHandler ResultIsReady;
+        public MNISTModel(string modelPath=@"..\MNISTModelLib\mnist-8.onnx", 
+                          string inputName="Input3")
         {
             ErrorMsg=null;
             ModelPath=modelPath;
             InputName=inputName;
         }
-        public string PredImage(string imagePath)
+        public MNISTModelResult PredImage(string imagePath)
         {
             Image<Rgb24> image;
-            string strOutput="";
+            MNISTModelResult result=new MNISTModelResult();
             try
             {
                 //crop
                 image = Image.Load<Rgb24>(imagePath, out IImageFormat format);
                 Stream imageStream = new MemoryStream();
                 image.Mutate(x =>
+                {
+                    x.Resize(new ResizeOptions
                     {
-                        x.Resize(new ResizeOptions
-                            {
-                                Size = new Size(imageWidth, imageHeight),
-                                Mode = ResizeMode.Crop
-                            }
-                        );
-                    }
-                );
+                        Size = new Size(imageWidth, imageHeight),
+                        Mode = ResizeMode.Crop
+                    });
+                });
                 image.Save(imageStream, format);
                 //make a tensor
                 Tensor<float> input = new DenseTensor<float>(new[] { 1, 1, image.Width, image.Height});
@@ -72,34 +101,36 @@ namespace ModelLib
                 IEnumerable<float> output = results.First().AsEnumerable<float>();
                 IEnumerable<float> softmax = output.Select(x => (float)Math.Exp(x) / 
                     output.Sum(x => (float)Math.Exp(x)));
-                int i=0;
+                //select max
+                Dictionary<int, float> dictOutput=new Dictionary<int, float>();
+                int key=0;
                 foreach(var value in softmax)
                 {
-                    strOutput+=i.ToString()+": "+value+"; ";
-                    i++;
+                    dictOutput.Add(key, value);
+                    key++;
                 }
+                var maxConfElem=dictOutput.FirstOrDefault(elem => elem.Value==dictOutput.Values.Max());
+                result.ImagePath=imagePath;
+                result.ImageClass=maxConfElem.Key;
+                result.Confidence=maxConfElem.Value;
             }
             catch(Exception ex)
             {
                 ErrorMsg=ex.Message;    
             }
-            return strOutput;
+            return result;
         }
-        public void PredImages(string dirPath, Stream outstream, CancellationToken token)
+        public void PredImages(string dirPath, CancellationToken token)
         {
             var files=Directory.EnumerateFiles(dirPath).ToList<string>();
             ParallelOptions options = new ParallelOptions();
             options.CancellationToken = token;
-            StreamWriter writer=new StreamWriter(outstream);
             try {
                 Parallel.For(0, files.Count(), options, (i) =>
                 {
-                    string output=this.PredImage(files[i]);
-                    lock (writer) {
-                        writer.WriteLine(i+"."+files[i]+" "+output+"\n");
-                    }
+                    var result=this.PredImage(files[i]);
+                    ResultIsReady(this, new ResultEventArgs(result));
                 });
-                writer.Dispose();
             }
             catch(Exception ex)
             {
