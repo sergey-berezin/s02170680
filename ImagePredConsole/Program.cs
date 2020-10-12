@@ -21,8 +21,14 @@ namespace ImagePredConsole
             MNISTModel model=new MNISTModel();
             Console.CancelKeyPress += new ConsoleCancelEventHandler(CancelEventHandler);
             model.ResultIsReady+=ResultEventHandler;
-            model.PredImages(@"..\MNISTModelLib\Samples", source.Token); 
-            Console.Write(model.ErrorMsg);
+            try
+            {
+                model.PredImages(@"..\MNISTModelLib\Samples", source.Token);    
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
     }
 }
