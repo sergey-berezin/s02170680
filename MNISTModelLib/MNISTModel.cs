@@ -25,6 +25,12 @@ namespace MNISTModelLib
             ImageClass=imageClass;
             Confidence=confidence;
         }
+        public MNISTModelResult(MNISTModelResult result)
+        {
+            ImagePath=result.ImagePath;
+            ImageClass=result.ImageClass;
+            Confidence=result.Confidence;
+        }
         public override string ToString()
         {
             return ImagePath+": "+"class = "+ImageClass.ToString()+
@@ -46,10 +52,14 @@ namespace MNISTModelLib
 
     public class MNISTModel
     {
+        const int numOfClasses = 10;
         const int imageWidth=28;
         const int imageHeight=28;
         string ModelPath {get;}
         string InputName {get;}
+
+        public static int NumOfClasses => numOfClasses;
+
         public event ResultEventHandler ResultIsReady;
         public MNISTModel(string modelPath=@"..\MNISTModelLib\mnist-8.onnx", 
                           string inputName="Input3")
@@ -112,9 +122,11 @@ namespace MNISTModelLib
             result.Confidence=maxConfElem.Value;
             return result;
         }
-        public void PredImages(string dirPath, CancellationToken token)
+        public async Task PredImages(string dirPath, CancellationToken token)
         {
-            var files=Directory.EnumerateFiles(dirPath);
+            var files= await Task.Run<IEnumerable<string>>(()=> 
+                {return Directory.EnumerateFiles(dirPath);});
+            // var files=Directory.EnumerateFiles(dirPath);
             ParallelOptions options = new ParallelOptions();
             options.CancellationToken = token;
             Parallel.ForEach(files, options, (file) =>

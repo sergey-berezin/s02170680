@@ -1,0 +1,53 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ImagePredUI;assembly=ImagePredUI"
+        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="450"
+        x:Class="ImagePredUI.MainWindow"
+        Title="ImagePredUI">
+
+    <Window.Resources>
+        <local:ImageConverter x:Key="ImageConverter"/>
+    </Window.Resources>
+
+    <Grid RowDefinitions="1*, 3*" ColumnDefinitions="2*, 1*">
+
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Left"
+                    Margin="20, 10">
+            <TextBlock Name="TextBlockDir" Text="Choose directory containing only images" 
+                       FontSize="13"/>
+            <Button Content="choose" Click="ChooseDirClick" Width="50" Height="25" 
+                    Margin="10, 0"/>
+        </StackPanel>
+
+        <Button Content="show all" Click="ShowAllClick"
+                Grid.Row="0" Grid.Column="1" Width="55" Height="25" 
+                VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="10"/>
+
+        <ListBox Name="ListBoxImages" Items="{Binding ImageResults}" Grid.Row="1" Grid.Column="0" Margin="10">
+            <ListBox.ItemTemplate> 
+                <DataTemplate>
+                    <Grid RowDefinitions="Auto, Auto" Margin="10">
+                        <Image Source="{Binding ImagePath, Converter={StaticResource ImageConverter}}" 
+                               Grid.Row="0"/>
+                        <StackPanel Orientation="Horizontal" Grid.Row="1" 
+                                    HorizontalAlignment="Center" Margin="0, 5, 0, 0">
+                            <TextBlock>class= </TextBlock>
+                            <TextBlock Text="{Binding ImageClass}"/>
+                            <TextBlock>, confidence= </TextBlock>
+                            <TextBlock Text="{Binding Confidence}"/>
+                        </StackPanel>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <ListBox Name="ListBoxClasses"  Items="{Binding ClassesInfo}"
+                 SelectionChanged="ClassSelectionChanged"
+                 Grid.Row='1' Grid.Column="1" Margin="10">
+        </ListBox>
+
+    </Grid>
+    
+</Window>
