@@ -15,7 +15,7 @@ namespace ImagePredUI
         {
             InitializeComponent();
             modelVM=new MNISTModelVM();
-            Console.CancelKeyPress += modelVM.CancelEventHandler;
+            
             this.DataContext=modelVM;
         }
         private void InitializeComponent()
@@ -37,6 +37,10 @@ namespace ImagePredUI
                 
             }
             else {textBlock.Text="Choose directory containing only images";}
+        }
+        void StopClick(object sender, RoutedEventArgs args)
+        {
+            modelVM.Source.Cancel();
         }
         void ShowAllClick(object sender, RoutedEventArgs args)
         {

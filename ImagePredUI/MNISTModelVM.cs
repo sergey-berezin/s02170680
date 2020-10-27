@@ -24,6 +24,7 @@ namespace ImagePredUI {
             var images=await Task.Run<IEnumerable<string>>(()=> 
                 {return Directory.EnumerateFiles(dirPath);});
             ImageResults.Clear();
+            Source = new CancellationTokenSource();
             foreach(var imageClass in ImageClasses)
             {
                 imageClass.Clear();
@@ -34,10 +35,11 @@ namespace ImagePredUI {
             {
                 ImageResults.Add(new MNISTModelResult(image));
             }
-            await model.PredImages(dirPath, source.Token);
+            await Task.Run(()=>model.PredImages(dirPath, Source.Token));
         }
+        public CancellationTokenSource Source {get; set;}
         MNISTModel model;
-        CancellationTokenSource source;
+        
         public MNISTModelVM()
         {
             model=new MNISTModel();
@@ -50,28 +52,29 @@ namespace ImagePredUI {
                 ImageClasses.Add(new ObservableCollection<MNISTModelResult>());
                 ClassesInfo.Add(ClassInfoProcess(i, 0));
             }
-            source=new CancellationTokenSource();
-        }
-        public void CancelEventHandler(object sender, ConsoleCancelEventArgs args)
-        {
-            source.Cancel();
+            Source=new CancellationTokenSource();
         }
         void ResultEventHandler(object sender, ResultEventArgs args) 
-        {
+        { 
             var result=args.Result;
             int index=0;
-            foreach (var image in ImageResults) 
-            {
-                if (image.ImagePath==result.ImagePath)
+            lock(ImageResults) {
+                foreach (var image in ImageResults) 
                 {
-                    index=ImageResults.IndexOf(image);
-                    break;
+                    if (image.ImagePath==result.ImagePath)
+                    {
+                        index=ImageResults.IndexOf(image);
+                        break;
+                    }
                 }
-            } 
-            Dispatcher.UIThread.InvokeAsync(()=>{ImageResults[index]=new MNISTModelResult(result);
-                ImageClasses[result.ImageClass].Add(new MNISTModelResult(result));
-                ClassesInfo[result.ImageClass]=ClassInfoProcess(result.ImageClass, 
-                    ImageClasses[result.ImageClass].Count);});
+                Dispatcher.UIThread.InvokeAsync(()=> {
+                    lock(ImageResults) {
+                        ImageResults[index]=new MNISTModelResult(result);
+                        ImageClasses[result.ImageClass].Add(new MNISTModelResult(result));
+                        ClassesInfo[result.ImageClass]=ClassInfoProcess(result.ImageClass, 
+                            ImageClasses[result.ImageClass].Count);}});
+                    
+            }   
         }
         string ClassInfoProcess(int imageClass, int number)
         {
