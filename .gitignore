@@ -136,4 +136,13 @@ $RECYCLE.BIN/
 _NCrunch*
 
 # output
-output.txt
+*.txt
+
+# samples
+MNISTModelLib/Samples/Decoded
+
+# data bases
+*.db
+*.db-shm
+*.db-wal
+Migrations/
