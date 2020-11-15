@@ -10,8 +10,6 @@ using System.Drawing;
 using System.Linq;
 using System.ComponentModel;
 
-#pragma warning disable CS4014
-
 namespace ImagePredUIDb.ViewModels {  
     class MNISTModelVM: INotifyPropertyChanged
     {
@@ -91,7 +89,7 @@ namespace ImagePredUIDb.ViewModels {
                             }
                         }); 
                         imagesToClassify.Add(imagePath);  
-                        model.PredImages(imagesToClassify, Source.Token);
+                        model.PredImages(imagesToClassify, Source.Token).Wait();
                     }
                 });
             });    

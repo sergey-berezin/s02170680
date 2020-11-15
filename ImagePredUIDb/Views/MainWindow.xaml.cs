@@ -6,8 +6,6 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using ImagePredUIDb.ViewModels;
 
-#pragma warning disable CS4014
-
 namespace ImagePredUIDb.Views
 {   
     public class MainWindow : Window
@@ -44,9 +42,9 @@ namespace ImagePredUIDb.Views
         {
             modelVM.Source.Cancel();
         }
-        void DeleteClick(object sender, RoutedEventArgs args)
+        async void DeleteClick(object sender, RoutedEventArgs args)
         {
-            modelVM.DeleteDatabase();
+            await modelVM.DeleteDatabase();
         }
         void ShowAllClick(object sender, RoutedEventArgs args)
         {
