@@ -54,6 +54,7 @@ namespace ImagePredUIDb.ViewModels {
             processed=0;
             numOfImages=imagePaths.Count();
             ProdProgressInfo();
+            dbContext=new ImageDbContext();
             await Task.Run(()=>
             {
                 Parallel.ForEach(imagePaths, options, (imagePath)=>
@@ -99,7 +100,7 @@ namespace ImagePredUIDb.ViewModels {
         {
             await Task.Run(()=> 
             {
-                using (ImageDbContext dbContext=new ImageDbContext())
+                lock (dbContext)
                 {
                     try {
                         dbContext.Database.EnsureDeleted();   
@@ -111,6 +112,7 @@ namespace ImagePredUIDb.ViewModels {
         }
 
         MNISTModel model;
+        ImageDbContext dbContext;
 
         public MNISTModelVM()
         {
@@ -155,7 +157,7 @@ namespace ImagePredUIDb.ViewModels {
                 });  
                 Task.Run(()=> 
                 {
-                    using (ImageDbContext dbContext=new ImageDbContext()) 
+                    lock (dbContext) 
                     {
                         Bitmap resImage=new Bitmap(result.ImagePath);
                         Blob resBlob=new Blob {Bytes=ImageToByteArray(resImage)};
@@ -190,7 +192,7 @@ namespace ImagePredUIDb.ViewModels {
                 blob=ImageToByteArray(new Bitmap(imagePath));
             }
             catch(Exception) {return null;}
-            using(ImageDbContext dbContext=new ImageDbContext())
+            lock (dbContext)
             {
                 ClassifiedImage classifiedImage;
                 var classifiedImages=dbContext.ClassifiedImages.
