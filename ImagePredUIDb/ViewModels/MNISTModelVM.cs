@@ -197,8 +197,7 @@ namespace ImagePredUIDb.ViewModels {
                 ClassifiedImage classifiedImage;
                 var classifiedImages=dbContext.ClassifiedImages.
                     Where(img => 
-                        img.Path.Equals(imagePath)).
-                    Select(img => img).ToList();
+                        img.Path.Equals(imagePath)).ToList();
                 if (classifiedImages.Any()) 
                 {
                     classifiedImage=classifiedImages.First();
