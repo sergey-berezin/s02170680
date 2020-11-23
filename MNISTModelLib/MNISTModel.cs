@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace MNISTModelLib
 {
-    public struct MNISTModelResult 
+    public class MNISTModelResult 
     {
         public string ImagePath {get; set;}
         public int ImageClass {get; set;}
@@ -76,7 +76,7 @@ namespace MNISTModelLib
         {
             Image<Rgb24> image;
             MNISTModelResult result=new MNISTModelResult();
-           
+        
             //crop
             image = Image.Load<Rgb24>(imagePath, out IImageFormat format);
             Stream imageStream = new MemoryStream();
@@ -128,18 +128,30 @@ namespace MNISTModelLib
             return result;
         }
 
-        public async Task PredImages(string dirPath, CancellationToken token)
+        /*Method changed*/
+        public async Task PredImages<T>(T directory, CancellationToken token)
         {
-            var files= await Task.Run<IEnumerable<string>>(()=> 
-                {return Directory.EnumerateFiles(dirPath);});
-
+            IEnumerable<string> files;
+            if (directory is string dirPath) {
+                files= await Task.Run<IEnumerable<string>>(()=> 
+                    {return Directory.EnumerateFiles(dirPath);});
+            }
+            else if (directory is IEnumerable<string> dirFiles){
+                files = dirFiles;
+            }
+            else {
+                throw new ArgumentException("Only types string and IEnumerable<string> are supported");
+            }
             ParallelOptions options = new ParallelOptions();
             options.CancellationToken = token;
             Parallel.ForEach(files, options, (file) =>
             {
-                var result=this.PredImage(file);
+                MNISTModelResult result=new MNISTModelResult(file);
+                result=this.PredImage(file);
                 ResultIsReady?.Invoke(this, new ResultEventArgs(result));
+            
             });
         }
+
     }
 }

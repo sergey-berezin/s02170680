@@ -27,9 +27,9 @@ namespace ImagePredConsole
             model.ResultIsReady+=ResultEventHandler;
             try
             {
-                await model.PredImages(@"..\MNISTModelLib\Samples", source.Token);
-   
-
+                // Console.Write("Choose directories with images: ");
+                string dirPath=@"..\MNISTModelLib\Samples\Decoded"; //Console.ReadLine();
+                await model.PredImages(dirPath, source.Token);
             }
             catch (Exception ex)
             {
