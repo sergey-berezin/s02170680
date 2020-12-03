@@ -73,9 +73,9 @@ namespace ImagePredUIDb.ViewModels {
                             lock(ImageResults) 
                             {
                                 ImageResults.Add(dbImage);
-                                ImageClasses[dbImage.ImageClass].Add(dbImage);
-                                    ClassesInfo[dbImage.ImageClass]=ClassInfoProcess(dbImage.ImageClass, 
-                                        ImageClasses[dbImage.ImageClass].Count);
+                                ImageClasses[dbImage.Class].Add(dbImage);
+                                    ClassesInfo[dbImage.Class]=ClassInfoProcess(dbImage.Class, 
+                                        ImageClasses[dbImage.Class].Count);
                                 processed++;
                                 ProdProgressInfo();
                             }
@@ -139,7 +139,7 @@ namespace ImagePredUIDb.ViewModels {
             lock(ImageResults) {
                 foreach (var image in ImageResults) 
                 {
-                    if (image.ImagePath==result.ImagePath)
+                    if (image.Path==result.Path)
                     {
                         index=ImageResults.IndexOf(image);
                         break;
@@ -148,9 +148,9 @@ namespace ImagePredUIDb.ViewModels {
                 Dispatcher.UIThread.InvokeAsync(()=> {
                     lock(ImageResults) {
                         ImageResults[index]=new MNISTModelResultDb(result);
-                        ImageClasses[result.ImageClass].Add(new MNISTModelResultDb(result));
-                        ClassesInfo[result.ImageClass]=ClassInfoProcess(result.ImageClass, 
-                            ImageClasses[result.ImageClass].Count);
+                        ImageClasses[result.Class].Add(new MNISTModelResultDb(result));
+                        ClassesInfo[result.Class]=ClassInfoProcess(result.Class, 
+                            ImageClasses[result.Class].Count);
                         processed++;
                         ProdProgressInfo();
                     }
@@ -159,10 +159,10 @@ namespace ImagePredUIDb.ViewModels {
                 {
                     lock (dbContext) 
                     {
-                        Bitmap resImage=new Bitmap(result.ImagePath);
+                        Bitmap resImage=new Bitmap(result.Path);
                         Blob resBlob=new Blob {Bytes=ImageToByteArray(resImage)};
-                        dbContext.ClassifiedImages.Add(new ClassifiedImage {Path=result.ImagePath, 
-                            Class=result.ImageClass, Confidence=result.Confidence, 
+                        dbContext.ClassifiedImages.Add(new ClassifiedImage {Path=result.Path, 
+                            Class=result.Class, Confidence=result.Confidence, 
                             RetrieveCount=0, Image=resBlob});
                         dbContext.Blobs.Add(resBlob);
                         dbContext.SaveChanges();
@@ -197,8 +197,7 @@ namespace ImagePredUIDb.ViewModels {
                 ClassifiedImage classifiedImage;
                 var classifiedImages=dbContext.ClassifiedImages.
                     Where(img => 
-                        img.Path.Equals(imagePath)).
-                    Select(img => img).ToList();
+                        img.Path.Equals(imagePath)).ToList();
                 if (classifiedImages.Any()) 
                 {
                     classifiedImage=classifiedImages.First();

@@ -61,7 +61,7 @@ namespace ImagePredUI.ViewModels {
             lock(ImageResults) {
                 foreach (var image in ImageResults) 
                 {
-                    if (image.ImagePath==result.ImagePath)
+                    if (image.Path==result.Path)
                     {
                         index=ImageResults.IndexOf(image);
                         break;
@@ -70,9 +70,9 @@ namespace ImagePredUI.ViewModels {
                 Dispatcher.UIThread.InvokeAsync(()=> {
                     lock(ImageResults) {
                         ImageResults[index]=new MNISTModelResult(result);
-                        ImageClasses[result.ImageClass].Add(new MNISTModelResult(result));
-                        ClassesInfo[result.ImageClass]=ClassInfoProcess(result.ImageClass, 
-                            ImageClasses[result.ImageClass].Count);}});
+                        ImageClasses[result.Class].Add(new MNISTModelResult(result));
+                        ClassesInfo[result.Class]=ClassInfoProcess(result.Class, 
+                            ImageClasses[result.Class].Count);}});
                     
             }   
         }
