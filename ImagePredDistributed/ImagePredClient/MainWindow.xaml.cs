@@ -10,7 +10,7 @@ namespace ImagePredClient
 {
     public class MainWindow : Window
     {
-        private Client client;
+        private IClient client;
         public MainWindow()
         {
             InitializeComponent();

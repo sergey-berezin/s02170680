@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Classified Images</title>
+        <style type="text/css">
+            button {
+                width: max-content;
+                height: max-content;
+                background-color: rgba(78, 78, 78, 0.329);
+                margin-right: 2ex;
+            }
+            image {
+                width: max-content;
+                height: max-content;
+            }
+        </style>
+        <script src="jquery-3.5.1.min.js"></script>       
+        <script src="ClassifiedImages.js"></script>
+    </head>
+    <body>
+        <div>
+            <center>
+                <span> chose image class: </span>
+                <select id="classes" onchange="onClassSelect()"
+                        style="width: max-content; margin: 10px;"></select>
+            </center>
+        <div id="classifiedImage" style="margin: 10px;"></div>
+        <div id="buttonsDiv" style="margin: 10px;"></div>
+    </body>
+</html>

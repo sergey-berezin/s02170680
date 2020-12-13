@@ -11,7 +11,7 @@ using Avalonia.Threading;
 
 namespace ImagePredClient
 {
-    class Client: INotifyPropertyChanged
+    class Client: INotifyPropertyChanged, IClient
     {
         private ClassifiedImage selectedImage;
         public ClassifiedImage SelectedImage {
@@ -47,10 +47,7 @@ namespace ImagePredClient
         public Client()
         {
          
-            SelectedImage=new ClassifiedImage()
-            {
-                Id=-1, Class=-1, Confidence=-1, RetrieveCount=-1
-            };
+            SelectedImage=null;
             DbImages=new ObservableCollection<ClassifiedImage>();
             Stats=new ObservableCollection<string>();
         }
