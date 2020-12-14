@@ -40,13 +40,13 @@
             <ListBox.ItemTemplate> 
                 <DataTemplate>
                     <Grid RowDefinitions="Auto, Auto, Auto" Margin="10">
-                        <Image Source="{Binding ImagePath, Converter={StaticResource ImageConverter}}" 
+                        <Image Source="{Binding Path, Converter={StaticResource ImageConverter}}" 
                                Grid.Row="0" Margin="10"/>
-                        <TextBlock Text="{Binding ImagePath}" Grid.Row="1"/>
+                        <TextBlock Text="{Binding Path}" Grid.Row="1"/>
                         <StackPanel Orientation="Horizontal" Grid.Row="2" 
                                     HorizontalAlignment="Center" Margin="0, 5, 0, 0">
                             <TextBlock>class= </TextBlock>
-                            <TextBlock Text="{Binding ImageClass}"/>
+                            <TextBlock Text="{Binding Class}"/>
                             <TextBlock>, confidence= </TextBlock>
                             <TextBlock Text="{Binding Confidence}"/>
                             <TextBlock>, retrieveCount= </TextBlock>

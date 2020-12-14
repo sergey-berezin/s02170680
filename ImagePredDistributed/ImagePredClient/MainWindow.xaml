@@ -1,0 +1,109 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ImagePredClient;assembly=ImagePredClient"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="ImagePredClient.MainWindow"
+        Title="ImagePredClient">
+
+    <Window.Resources>
+        <local:ImageBase64Converter x:Key="ImageBase64Converter"/>
+    </Window.Resources>    
+        
+    <Grid RowDefinitions="0.5*, 1*, 3*" ColumnDefinitions="1*, 1.5*, 0.5*">
+
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Left"
+                    Margin="20, 10">
+            <TextBlock Name="TextBlockImage" Text="Choose image to classify" 
+                       FontSize="13"/>
+            <Button Content="choose" Click="ChooseImageClick" Width="50" Height="25" 
+                    Margin="10, 0"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="10">
+            <TextBlock Text="Error msg box: " FontSize="13" Height="25"/>
+            <TextBox Name="TextBoxError" Width="200" Height="30" Margin="10, 0"/>
+        </StackPanel>    
+
+        <StackPanel Grid.Row="1" Grid.Column="1"
+                    Orientation="Vertical" HorizontalAlignment="Left" 
+                    VerticalAlignment="Bottom" Margin="10">
+            <Button Content="Get all classified" Click="GetImagesClick"
+                    Width="110" Height="25" Margin="0, 10, 0, 0"/>
+
+            <Button Content="Delete database" Click="DeleteClick" 
+                    Width="110" Height="25" Margin="0, 10, 0, 0"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="2" VerticalAlignment="Center" Margin="10"> 
+            <Image Name="SelectedImage"
+                   Source="{Binding SelectedImage.ImageBase64, 
+                                Converter={StaticResource ImageBase64Converter}}" 
+                   Width="55" Height="55"
+                   Grid.Row="0" Margin="10"/>
+            <StackPanel Orientation="Vertical" Grid.Row="2" 
+                                    HorizontalAlignment="Center" Margin="0, 5, 0, 0">
+                <StackPanel Orientation="Horizontal">                   
+                    <TextBlock Text="Id: "/>
+                    <TextBlock Text="{Binding SelectedImage.Id}">, </TextBlock>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="name: "/>
+                    <TextBlock Text="{Binding SelectedImage.Name}">, </TextBlock>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="class: "/>
+                    <TextBlock Text="{Binding SelectedImage.Class}">, </TextBlock>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="confidence: "/>
+                    <TextBlock Text="{Binding SelectedImage.Confidence}">, </TextBlock>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="retrieve count: "/>
+                    <TextBlock Text="{Binding SelectedImage.RetrieveCount}"/>
+                </StackPanel>            
+            </StackPanel>
+        </StackPanel>
+        
+        <ListBox Name="ListBoxDbImages" Items="{Binding DbImages}" Grid.Row="2" Grid.Column="1"
+                 Margin="10">
+            <ListBox.ItemTemplate> 
+                <DataTemplate>
+                    <Grid RowDefinitions="Auto, Auto, Auto" Margin="10">
+                        <Image Source="{Binding ImageBase64, , Converter={StaticResource ImageBase64Converter}}" 
+                               Grid.Row="0" Margin="10"/>
+                        <StackPanel Orientation="Vertical" Grid.Row="2" 
+                                    HorizontalAlignment="Center" Margin="0, 5, 0, 0">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <TextBlock Text="Id: "/>
+                                <TextBlock Text="{Binding Id}"/>
+                                <TextBlock Text=", name: "/>
+                                <TextBlock Text="{Binding Name}"/>
+                                <TextBlock Text=","/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <TextBlock Text="class: "/>
+                                <TextBlock Text="{Binding Class}"/>
+                                <TextBlock Text=", confidence: "/>
+                                <TextBlock Text="{Binding Confidence}"/>
+                                <TextBlock Text=", retrieve count: "/>
+                                <TextBlock Text="{Binding RetrieveCount}"/>
+                            </StackPanel>    
+                        </StackPanel>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <TextBlock Text="Stats: " FontSize="13" Grid.Row="1" Grid.Column="2"
+                   VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="10"/>
+
+        <ListBox Name="ListBoxStats"  Items="{Binding Stats}"
+                 Grid.Row='2' Grid.Column="2" Margin="10">
+        </ListBox>
+
+    </Grid>
+   
+</Window>

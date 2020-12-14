@@ -146,3 +146,6 @@ MNISTModelLib/Samples/Decoded
 *.db-shm
 *.db-wal
 Migrations/
+
+#Console client (debug version)
+ImagePredDistributed/ImagePredClientConsole/

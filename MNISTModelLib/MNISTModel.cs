@@ -16,25 +16,25 @@ namespace MNISTModelLib
 {
     public class MNISTModelResult 
     {
-        public string ImagePath {get; set;}
-        public int ImageClass {get; set;}
+        public string Path {get; set;}
+        public int Class {get; set;}
         public float Confidence {get; set;}
-        public MNISTModelResult(string imagePath=null, int imageClass=-1, float confidence=-1)
+        public MNISTModelResult(string path=null, int imageClass=-1, float confidence=-1)
         {
-            ImagePath=imagePath;
-            ImageClass=imageClass;
+            Path=path;
+            Class=imageClass;
             Confidence=confidence;
         }
 
         public MNISTModelResult(MNISTModelResult result)
         {
-            ImagePath=result.ImagePath;
-            ImageClass=result.ImageClass;
+            Path=result.Path;
+            Class=result.Class;
             Confidence=result.Confidence;
         }
         public override string ToString()
         {
-            return ImagePath+": "+"class = "+ImageClass.ToString()+
+            return Path+": "+"class = "+Class.ToString()+
                    ", confidence = "+Confidence.ToString();
         }
     }
@@ -46,7 +46,7 @@ namespace MNISTModelLib
         public MNISTModelResult Result {get;}
         public ResultEventArgs(MNISTModelResult result) 
         {
-            Result=new MNISTModelResult(result.ImagePath, result.ImageClass, result.Confidence);
+            Result=new MNISTModelResult(result.Path, result.Class, result.Confidence);
         }
     }
 
@@ -72,13 +72,25 @@ namespace MNISTModelLib
             ModelPath=modelPath;
             InputName=inputName;
         }
-        public MNISTModelResult PredImage(string imagePath)
+        public MNISTModelResult PredImage<T>(T inputImage)
         {
-            Image<Rgb24> image;
+            Image<Rgb24> image=null;
             MNISTModelResult result=new MNISTModelResult();
-        
+            IImageFormat format=null;
+            string imagePath=null;
+            if (inputImage is string)
+            {
+                imagePath=inputImage as string;
+                image = Image.Load<Rgb24>(imagePath, out format);
+            }
+            else if (inputImage is byte[] byteArr)
+            {
+                image = Image.Load<Rgb24>(byteArr, out format);
+            }
+            
             //crop
-            image = Image.Load<Rgb24>(imagePath, out IImageFormat format);
+            
+           
             Stream imageStream = new MemoryStream();
             image.Mutate(x =>
             {
@@ -122,8 +134,8 @@ namespace MNISTModelLib
                 key++;
             }
             var maxConfElem=dictOutput.FirstOrDefault(elem => elem.Value==dictOutput.Values.Max());
-            result.ImagePath=imagePath;
-            result.ImageClass=maxConfElem.Key;
+            result.Path=imagePath;
+            result.Class=maxConfElem.Key;
             result.Confidence=maxConfElem.Value;
             return result;
         }
